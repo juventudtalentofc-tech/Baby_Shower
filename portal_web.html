@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portal Externo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,14 +22,19 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            touch-action: manipulation;
         }
         
         body {
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
-            height: 100vh;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -41,6 +46,11 @@
             box-shadow: var(--shadow);
             z-index: 100;
             flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .controls.hidden {
+            transform: translateY(-100%);
         }
         
         .container {
@@ -90,9 +100,33 @@
             backdrop-filter: blur(5px);
         }
         
-        button:hover {
+        button:hover, button:active {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 99;
+            background: rgba(139, 126, 200, 0.9);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            border: none;
+            font-size: 20px;
+        }
+        
+        .back-button:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
         }
         
         .preview-container {
@@ -197,11 +231,6 @@
             background: #FF6B6B;
         }
         
-        .controls.hidden {
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-        }
-        
         /* Responsive Design */
         @media (max-width: 768px) {
             .controls-content {
@@ -218,6 +247,13 @@
             button {
                 flex: 1;
             }
+            
+            .back-button {
+                width: 45px;
+                height: 45px;
+                top: 15px;
+                left: 15px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -232,6 +268,12 @@
             button {
                 padding: 8px 12px;
                 font-size: 12px;
+            }
+            
+            .back-button {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
             }
         }
     </style>
@@ -252,6 +294,10 @@
             </div>
         </div>
     </div>
+    
+    <button class="back-button" id="backButton" style="display: none;">
+        <i class="fas fa-arrow-left"></i>
+    </button>
     
     <div class="preview-container">
         <div class="preview-content">
@@ -283,6 +329,7 @@
             const refreshBtn = document.getElementById('refreshBtn');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
             const hideControlsBtn = document.getElementById('hideControlsBtn');
+            const backButton = document.getElementById('backButton');
             const controls = document.getElementById('controls');
             const loadingIndicator = document.getElementById('loadingIndicator');
             const errorMessage = document.getElementById('errorMessage');
@@ -309,6 +356,7 @@
                 loadingIndicator.style.display = 'flex';
                 errorMessage.style.display = 'none';
                 previewFrame.style.display = 'none';
+                backButton.style.display = 'none';
                 
                 // Cargar la URL en el iframe
                 previewFrame.src = url;
@@ -318,6 +366,7 @@
             previewFrame.addEventListener('load', function() {
                 loadingIndicator.style.display = 'none';
                 previewFrame.style.display = 'block';
+                backButton.style.display = 'flex';
                 showNotification('Sitio web cargado correctamente');
             });
             
@@ -325,6 +374,7 @@
             previewFrame.addEventListener('error', function() {
                 loadingIndicator.style.display = 'none';
                 errorMessage.style.display = 'flex';
+                backButton.style.display = 'none';
                 showNotification('Error al cargar el sitio web', true);
             });
             
@@ -336,8 +386,17 @@
                 }
             });
             
+            // Botón de retroceso
+            backButton.addEventListener('click', function() {
+                if (previewFrame.contentWindow && previewFrame.contentWindow.history.length > 1) {
+                    previewFrame.contentWindow.history.back();
+                } else {
+                    showNotification('No hay páginas anteriores para retroceder');
+                }
+            });
+            
             // Pantalla completa
-            fullscreenBtn.addEventListener('click', function() {
+            function toggleFullscreen() {
                 if (!document.fullscreenElement) {
                     document.documentElement.requestFullscreen().catch(err => {
                         showNotification('Error al activar pantalla completa', true);
@@ -347,7 +406,16 @@
                     document.exitFullscreen();
                     fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> Pantalla Completa';
                 }
-            });
+            }
+            
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // Activar pantalla completa automáticamente al cargar
+            setTimeout(() => {
+                if (!document.fullscreenElement) {
+                    toggleFullscreen();
+                }
+            }, 500);
             
             // Ocultar/mostrar controles
             hideControlsBtn.addEventListener('click', function() {
@@ -365,6 +433,19 @@
                 if (e.key === 'Escape' && document.fullscreenElement) {
                     fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> Pantalla Completa';
                 }
+            });
+            
+            // Prevenir zoom con gestos táctiles
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gesturechange', function(e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gestureend', function(e) {
+                e.preventDefault();
             });
             
             // Cargar la URL predefinida al iniciar
