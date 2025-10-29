@@ -36,6 +36,129 @@
             -webkit-font-smoothing: antialiased;
             touch-action: pan-y;
         }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-top: 6px solid var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--white);
+            font-size: clamp(1.2rem, 5vw, 1.6rem);
+            font-weight: 600;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Music Control Button */
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: musicPulse 2s ease-in-out infinite;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        @keyframes musicPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+            }
+        }
+
+        .music-control:active {
+            transform: scale(0.95);
+        }
+
+        .music-control i {
+            color: var(--white);
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .music-control.playing {
+            animation: musicPulse 2s ease-in-out infinite, rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .music-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            animation: wave 2s ease-out infinite;
+        }
+
+        .music-waves:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
         
         /* Hero Section with Parallax Effect */
         .hero {
@@ -60,10 +183,10 @@
             background-image: 
                 radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
-            animation: pulse 4s ease-in-out infinite;
+            animation: heroBreath 4s ease-in-out infinite;
         }
         
-        @keyframes pulse {
+        @keyframes heroBreath {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
         }
@@ -80,6 +203,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             animation: float-up 15s infinite ease-in-out;
+            will-change: transform;
         }
         
         .shape:nth-child(1) {
@@ -173,6 +297,7 @@
         .emoji-row span {
             animation: bounce 2s infinite;
             display: inline-block;
+            will-change: transform;
         }
         
         .emoji-row span:nth-child(2) {
@@ -210,12 +335,8 @@
         }
         
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .scroll-indicator {
@@ -458,8 +579,18 @@
             }
         }
         
-        /* Smooth Scroll */
+        /* Smooth Scroll Ultra Suave */
         html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 20px;
+        }
+
+        body {
+            scroll-behavior: smooth;
+        }
+
+        /* Efecto de desplazamiento personalizado */
+        * {
             scroll-behavior: smooth;
         }
         
@@ -467,16 +598,32 @@
         @keyframes fadeInScale {
             from {
                 opacity: 0;
-                transform: scale(0.9);
+                transform: scale(0.95) translateY(40px);
             }
             to {
                 opacity: 1;
-                transform: scale(1);
+                transform: scale(1) translateY(0);
             }
         }
         
         .section {
-            animation: fadeInScale 0.6s ease-out;
+            animation: fadeInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform, opacity;
+        }
+
+        /* Efecto de parallax en secciones */
+        .section {
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+        /* Transiciones suaves en cards */
+        .welcome-card,
+        .info-card {
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         
         /* Pull to Refresh Support */
@@ -489,9 +636,81 @@
             -webkit-user-select: none;
             user-select: none;
         }
+
+        /* Optimizations */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Cargando...</div>
+    </div>
+
+    <!-- 
+    ════════════════════════════════════════════════════════════════════
+    🎵 INSTRUCCIONES PARA AGREGAR TU MÚSICA 🎵
+    ════════════════════════════════════════════════════════════════════
+    
+    ⚠️ IMPORTANTE: La música se reproducirá AUTOMÁTICAMENTE ⚠️
+    
+    1. Sube tu archivo de música a un servicio como:
+       - Google Drive (hazlo público)
+       - Dropbox (obtén el link directo)
+       - Tu propio servidor web
+       - SoundCloud, Vocaroo, etc.
+    
+    2. Reemplaza "TU_URL_DE_MUSICA_AQUI.mp3" con la URL de tu música
+    
+    3. Formatos soportados: MP3, WAV, OGG
+    
+    ✨ OPCIONES DE HOSTING RECOMENDADAS:
+    
+    📌 Google Drive:
+       - Sube tu archivo
+       - Click derecho > Obtener enlace > Cambiar a "Cualquiera con el enlace"
+       - Copia el ID del archivo (la parte larga después de /d/)
+       - Usa: https://drive.google.com/uc?export=download&id=TU_ID_AQUI
+    
+    📌 Dropbox:
+       - Sube tu archivo
+       - Obtén el enlace compartido
+       - Cambia "dl=0" por "dl=1" al final de la URL
+    
+    📌 Vocaroo (Ideal para audios cortos):
+       - Graba o sube tu audio en vocaroo.com
+       - Copia el enlace directo del MP3
+    
+    💡 CONSEJO: Para mejor experiencia, usa archivos MP3 de buena calidad
+       pero no muy pesados (menos de 10MB) para que cargue rápido.
+    
+    🎚️ El volumen está configurado al 50% (puedes cambiarlo en la línea 
+       que dice: music.volume = 0.5;)
+    
+    ════════════════════════════════════════════════════════════════════
+    -->
+    <audio id="backgroundMusic" loop preload="auto" autoplay>
+        <source src="Música Instrumental Alegre para niños pequeños preescolar y jardin Música divertida.m4a" type="audio/mpeg">
+        <source src="TU_URL_DE_MUSICA_AQUI.ogg" type="audio/ogg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <!-- Music Control Button -->
+    <div class="music-control" id="musicControl">
+        <div class="music-waves"></div>
+        <div class="music-waves"></div>
+        <i class="fas fa-music"></i>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="floating-shapes">
@@ -598,5 +817,489 @@
             <p>La familia de <span class="heart">♥</span> Eileen Dallane</p>
         </footer>
     </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // 🎵 SISTEMA DE MÚSICA AUTOMÁTICA 🎵
+        // ═══════════════════════════════════════════════════════════════
+        
+        const music = document.getElementById('backgroundMusic');
+        const musicControl = document.getElementById('musicControl');
+        const loadingScreen = document.getElementById('loadingScreen');
+        let isPlaying = false;
+
+        // Configurar volumen inicial
+        music.volume = 0.5; // 50% del volumen máximo
+
+        // Función para reproducir música
+        function playMusic() {
+            music.play().then(() => {
+                isPlaying = true;
+                musicControl.classList.add('playing');
+                musicControl.innerHTML = '<div class="music-waves"></div><div class="music-waves"></div><i class="fas fa-pause"></i>';
+                console.log('🎵 ¡Música reproduciéndose!');
+            }).catch(error => {
+                console.log('⚠️ Intento automático bloqueado por el navegador. Se reproducirá al primer toque.', error);
+                // Mostrar indicador visual de que se necesita interacción
+                musicControl.style.animation = 'musicPulse 1s ease-in-out infinite, shake 0.5s ease-in-out';
+            });
+        }
+
+        // Función para pausar música
+        function pauseMusic() {
+            music.pause();
+            isPlaying = false;
+            musicControl.classList.remove('playing');
+            musicControl.innerHTML = '<div class="music-waves"></div><div class="music-waves"></div><i class="fas fa-play"></i>';
+        }
+
+        // 🎵 REPRODUCCIÓN AUTOMÁTICA AGRESIVA - Múltiples intentos
+        let autoplayAttempts = 0;
+        const maxAttempts = 5;
+
+        function attemptAutoplay() {
+            if (autoplayAttempts < maxAttempts && !isPlaying) {
+                playMusic();
+                autoplayAttempts++;
+                
+                // Reintentar cada 500ms si falla
+                if (!isPlaying) {
+                    setTimeout(attemptAutoplay, 500);
+                }
+            }
+        }
+
+        // Intentar reproducir inmediatamente al cargar
+        window.addEventListener('load', () => {
+            console.log('🎉 Página cargada - Iniciando música...');
+            
+            // Ocultar pantalla de carga
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                
+                // Primer intento inmediato
+                attemptAutoplay();
+            }, 800);
+        });
+
+        // Intentar reproducir ANTES de que cargue completamente (más agresivo)
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📱 DOM Cargado - Intento temprano de música...');
+            attemptAutoplay();
+        });
+
+        // Intentar con el primer movimiento del mouse/touch
+        const startMusicOnInteraction = () => {
+            if (!isPlaying) {
+                playMusic();
+            }
+        };
+
+        // Múltiples eventos para capturar cualquier interacción
+        ['touchstart', 'touchmove', 'touchend', 'click', 'scroll', 'mousemove'].forEach(event => {
+            document.addEventListener(event, startMusicOnInteraction, { once: true, passive: true });
+        });
+
+        // Control manual de música
+        musicControl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isPlaying) {
+                pauseMusic();
+            } else {
+                playMusic();
+            }
+        });
+
+        // Intentar con visibilitychange (cuando vuelves a la pestaña)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !isPlaying) {
+                playMusic();
+            }
+        });
+
+        // Estilo de animación shake para indicar que necesita interacción
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+
+        // ═══════════════════════════════════════════════════════════════
+        // 🚀 OPTIMIZACIONES DE RENDIMIENTO 🚀
+        // ═══════════════════════════════════════════════════════════════
+
+        // Smooth Scroll Mejorado con Easing
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Optimizar animaciones con Intersection Observer (mejorado)
+        const observerOptions = {
+            threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Efecto de aparición más suave
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0) scale(1)';
+                    
+                    // Animar elementos hijos con delay
+                    const children = entry.target.querySelectorAll('.welcome-card, .info-card, .confirmation-btn');
+                    children.forEach((child, index) => {
+                        setTimeout(() => {
+                            child.style.opacity = '1';
+                            child.style.transform = 'translateY(0) scale(1)';
+                        }, index * 100);
+                    });
+                }
+            });
+        }, observerOptions);
+
+        // Observar todas las secciones para animación lazy
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(50px) scale(0.95)';
+            section.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            observer.observe(section);
+        });
+
+        // Animar elementos internos
+        document.querySelectorAll('.welcome-card, .info-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px) scale(0.95)';
+            card.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // 📱 OPTIMIZACIONES MÓVILES 📱
+        // ═══════════════════════════════════════════════════════════════
+
+        // Prevenir zoom en inputs (por si agregas formularios después)
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // 🎯 SCROLL ULTRA SUAVE Y BUTTER - El mejor efecto de desplazamiento
+        let scrollTimeout;
+        let lastScrollTop = 0;
+        let scrollVelocity = 0;
+
+        // Momentum Scroll Mejorado
+        document.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            scrollVelocity = scrollTop - lastScrollTop;
+            lastScrollTop = scrollTop;
+
+            // Efecto parallax en hero más suave
+            const hero = document.querySelector('.hero');
+            const scrolled = window.pageYOffset;
+            const rate = scrolled * 0.3; // Reducido para más suavidad
+            if (hero) {
+                hero.style.transform = `translate3d(0, ${rate}px, 0)`;
+            }
+
+            // Efecto parallax en shapes flotantes
+            const shapes = document.querySelectorAll('.shape');
+            shapes.forEach((shape, index) => {
+                const speed = 0.1 + (index * 0.05);
+                const yPos = -(scrolled * speed);
+                shape.style.transform = `translate3d(0, ${yPos}px, 0)`;
+            });
+
+            // Efecto de profundidad en cards mientras scrolleas
+            const cards = document.querySelectorAll('.welcome-card, .info-card');
+            cards.forEach((card) => {
+                const rect = card.getBoundingClientRect();
+                const scrollPercent = (rect.top / window.innerHeight);
+                
+                if (scrollPercent < 1 && scrollPercent > -0.5) {
+                    const scale = 1 - (Math.abs(scrollPercent - 0.5) * 0.05);
+                    const opacity = 1 - (Math.abs(scrollPercent - 0.5) * 0.3);
+                    card.style.transform = `scale(${Math.max(scale, 0.95)})`;
+                    card.style.opacity = Math.max(opacity, 0.7);
+                }
+            });
+
+            // Efecto de fade en botón de música basado en scroll
+            const musicControl = document.getElementById('musicControl');
+            if (scrollTop > 200) {
+                musicControl.style.transform = 'scale(1)';
+                musicControl.style.opacity = '1';
+            } else {
+                const scale = 0.5 + (scrollTop / 400);
+                musicControl.style.opacity = scrollTop / 200;
+                musicControl.style.transform = `scale(${scale})`;
+            }
+
+            // Limpiar timeout anterior
+            clearTimeout(scrollTimeout);
+            
+            // Detectar cuando el scroll termina para animación final
+            scrollTimeout = setTimeout(() => {
+                scrollVelocity = 0;
+            }, 100);
+
+        }, { passive: true });
+
+        // Efecto de rubber band al llegar al final
+        let lastTouchY = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+            lastTouchY = touchStartY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchY - lastTouchY;
+            lastTouchY = touchY;
+
+            // Efecto de elasticidad visual
+            const scrollTop = window.pageYOffset;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+
+            // Al inicio de la página
+            if (scrollTop === 0 && deltaY > 0) {
+                document.body.style.transform = `translateY(${Math.min(deltaY * 0.5, 20)}px)`;
+            }
+            // Al final de la página
+            else if (scrollTop + clientHeight >= scrollHeight - 10 && deltaY < 0) {
+                document.body.style.transform = `translateY(${Math.max(deltaY * 0.5, -20)}px)`;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            // Restaurar posición con bounce
+            document.body.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            document.body.style.transform = 'translateY(0)';
+            
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 500);
+        }, { passive: true });
+
+        // ═══════════════════════════════════════════════════════════════
+        // 🎨 EFECTOS ADICIONALES ULTRA SUAVES 🎨
+        // ═══════════════════════════════════════════════════════════════
+
+        // Efecto de inclinación en cards al hacer hover/touch
+        document.querySelectorAll('.welcome-card, .info-card').forEach(card => {
+            card.addEventListener('touchstart', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.touches[0].clientX - rect.left;
+                const y = e.touches[0].clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                
+                this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                this.style.transition = 'transform 0.1s ease-out';
+            });
+            
+            card.addEventListener('touchend', function() {
+                this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                this.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+        });
+
+        // Efecto de ondas en el botón de confirmación
+        const confirmBtn = document.querySelector('.confirmation-btn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('touchstart', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.touches[0].clientX - rect.left - size / 2;
+                const y = e.touches[0].clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.6);
+                    left: ${x}px;
+                    top: ${y}px;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        }
+
+        // Agregar animación de ripple
+        const rippleStyle = document.createElement('style');
+        rippleStyle.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(rippleStyle);
+
+        // Efecto de parallax en emojis
+        const emojiRows = document.querySelectorAll('.emoji-row');
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            emojiRows.forEach((row, index) => {
+                const speed = 0.05 * (index + 1);
+                const yPos = scrolled * speed;
+                row.style.transform = `translateY(${yPos}px)`;
+            });
+        }, { passive: true });
+
+        // Prevenir comportamiento por defecto del pull-to-refresh en algunos navegadores
+        let startY = 0;
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].pageY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            const y = e.touches[0].pageY;
+            if (y > startY && window.scrollY === 0) {
+                // El navegador manejará el pull-to-refresh nativamente
+            }
+        }, { passive: true });
+
+        // ═══════════════════════════════════════════════════════════════
+        // 💾 OPTIMIZACIÓN DE RECURSOS 💾
+        // ═══════════════════════════════════════════════════════════════
+
+        // Lazy loading para futuros elementos multimedia
+        if ('loading' in HTMLImageElement.prototype) {
+            const images = document.querySelectorAll('img[loading="lazy"]');
+            images.forEach(img => {
+                img.src = img.dataset.src;
+            });
+        }
+
+        // Precargar la música para mejor experiencia
+        music.preload = 'auto';
+
+        // Ajustar volumen según preferencias del sistema (si está disponible)
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: 'Baby Shower - Eileen Dallane',
+                artist: 'Celebración',
+                album: 'Baby Shower',
+                artwork: [
+                    { src: 'icon-96x96.png', sizes: '96x96', type: 'image/png' },
+                    { src: 'icon-256x256.png', sizes: '256x256', type: 'image/png' }
+                ]
+            });
+
+            navigator.mediaSession.setActionHandler('play', () => {
+                playMusic();
+            });
+
+            navigator.mediaSession.setActionHandler('pause', () => {
+                pauseMusic();
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // 🎯 ANALYTICS Y TRACKING (Opcional) 🎯
+        // ═══════════════════════════════════════════════════════════════
+
+        // Rastrear si la música se reproduce automáticamente
+        music.addEventListener('play', () => {
+            console.log('🎵 Música iniciada');
+        });
+
+        music.addEventListener('error', (e) => {
+            console.error('❌ Error al cargar música:', e);
+            // Ocultar el control de música si hay error
+            musicControl.style.display = 'none';
+        });
+
+        // Detectar cuando la música termina (aunque esté en loop)
+        music.addEventListener('ended', () => {
+            console.log('🎵 Música finalizada');
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // 🔧 UTILIDADES ADICIONALES 🔧
+        // ═══════════════════════════════════════════════════════════════
+
+        // Función para vibrar en dispositivos móviles (feedback táctil)
+        function vibrate() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(10); // 10ms de vibración
+            }
+        }
+
+        // Agregar vibración a botones importantes
+        document.querySelectorAll('.confirmation-btn, .music-control').forEach(btn => {
+            btn.addEventListener('click', vibrate);
+        });
+
+        // Mostrar mensaje de bienvenida en consola
+        console.log('%c🎉 Baby Shower de Eileen Dallane 🎉', 'font-size: 20px; color: #764ba2; font-weight: bold;');
+        console.log('%c¡Bienvenido! Esta página está optimizada para móviles 📱', 'font-size: 14px; color: #667eea;');
+        console.log('%c💝 Desarrollado con amor 💝', 'font-size: 12px; color: #f093fb;');
+
+        // ═══════════════════════════════════════════════════════════════
+        // 🌟 EASTER EGG (Sorpresa oculta) 🌟
+        // ═══════════════════════════════════════════════════════════════
+
+        let clickCount = 0;
+        const babyName = document.querySelector('.baby-name');
+        
+        babyName.addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 5) {
+                // Crear confetti o efecto especial
+                document.body.style.animation = 'rainbow 2s ease-in-out';
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                    clickCount = 0;
+                }, 2000);
+            }
+        });
+
+        // Animación rainbow para el easter egg
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rainbow {
+                0% { filter: hue-rotate(0deg); }
+                50% { filter: hue-rotate(180deg); }
+                100% { filter: hue-rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('%c💡 Tip: Haz click 5 veces en el nombre para una sorpresa 💡', 'font-size: 10px; color: #ffd93d; font-style: italic;');
+    </script>
 </body>
 </html>
